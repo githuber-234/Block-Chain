@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Interface</title>
+    <style>
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000000;
+            color: #f9f9f9;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background-color: #2a2a3d;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: #00bcd4;
+        }
+
+        input[type="text"], input[type="number"], button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            background-color: #333344;
+            color: #f9f9f9;
+        }
+
+        button {
+            background-color: #00d4ff;
+            color: #1e1e2f;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0099cc;
+        }
+
+        pre#blockchain {
+            background-color: #333344;
+            color: #00ff99;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Blockchain Interface</h1>
+
+    <div class="container">
+        <div class="card">
+            <h2>Add a Transaction</h2>
+            <input type="text" id="sender" placeholder="Sender" />
+            <input type="text" id="receiver" placeholder="Receiver" />
+            <input type="number" id="amount" placeholder="Amount" />
+            <button onclick="addTransaction()">Add Transaction</button>
+        </div>
+
+        <div class="card">
+            <h2>Mine a Block</h2>
+            <button onclick="mineBlock()">Mine Block</button>
+        </div>
+
+        <div class="card">
+            <h2>Validate Blockchain</h2>
+            <button onclick="validateBlockchain()">Validate Blockchain</button>
+        </div>
+
+        <div class="card">
+            <h2>View Blockchain</h2>
+            <button onclick="fetchBlockchain()">View Blockchain</button>
+            <pre id="blockchain">Blockchain data will appear here...</pre>
+        </div>
+    </div>
+
+    <script>
+        async function fetchBlockchain() {
+            const response = await fetch('/blockchain');
+            const data = await response.json();
+            document.getElementById('blockchain').textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function addTransaction() {
+            const sender = document.getElementById('sender').value;
+            const receiver = document.getElementById('receiver').value;
+            const amount = document.getElementById('amount').value;
+
+            const response = await fetch('/add-transaction', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sender, receiver, amount })
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        }
+
+        async function mineBlock() {
+            const response = await fetch('/mine', { method: 'POST' });
+            const result = await response.json();
+            alert(result.message);
+            fetchBlockchain();
+        }
+
+        async function validateBlockchain() {
+            const response = await fetch('/validate');
+            const { isValid } = await response.json();
+            alert(`Blockchain is ${isValid ? 'valid' : 'invalid'}`);
+        }
+    </script>
+</body>
+</html>
